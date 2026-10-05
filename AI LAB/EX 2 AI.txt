@@ -1,0 +1,21 @@
+def solve(board, row):
+    if row == 8:
+        print("Solution:")
+        for i in range(8):
+            print(board[i])
+        return True
+    for col in range(8):
+        safe = True
+        for i in range(row):
+            if board[i] == col or abs(board[i] - col) == row - i:
+                safe = False
+                break
+        if safe:
+            board[row] = col
+
+            if solve(board, row + 1):
+                return True
+    return False
+board = [-1] * 8
+if not solve(board, 0):
+    print("No solution")
