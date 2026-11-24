@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WaterWise - AI Water Demand Forecasting</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+ <div class="brand">💧 Water<span>Wise</span></div>
+ <div class="side-label">WORKSPACE</div>
+ <nav class="nav">
+  <button class="active" data-page="dashboard">▦ &nbsp; Dashboard</button>
+  <button data-page="forecast">⌁ &nbsp; Demand Forecast</button>
+  <button data-page="model">◎ &nbsp; Model Evaluation</button>
+  <button data-page="agents">◈ &nbsp; Intelligent Agents</button>
+  <button data-page="allocation">⇄ &nbsp; Allocation Optimizer</button>
+  <button data-page="data">▤ &nbsp; Dataset Manager</button>
+  <button data-page="about">ⓘ &nbsp; Project Details</button>
+ </nav>
+ <div class="side-note">AI-powered planning for a more sustainable water future.<br><br><b>CSA1713 · Artificial Intelligence</b></div>
+</aside>
+
+<main class="main">
+<header class="top">
+<div>
+<div class="eyebrow">Intelligent water management</div>
+<h1 id="pageTitle">Dashboard Overview</h1>
+<div class="sub">Forecast demand, monitor shortages and plan water allocation.</div>
+</div>
+<span class="pill">● System Demo</span>
+</header>
+
+<section class="page active" id="dashboard">
+ <div class="grid stats">
+  <div class="card"><div class="stat-top">Predicted demand <span class="stat-icon">📈</span></div><div class="stat-value" id="dashDemand">128.4</div><div class="stat-foot">Billion cubic metres · demo value</div></div>
+  <div class="card"><div class="stat-top">Available supply <span class="stat-icon">💧</span></div><div class="stat-value" id="dashSupply">118.0</div><div class="stat-foot">Billion cubic metres · demo value</div></div>
+  <div class="card"><div class="stat-top">Supply gap <span class="stat-icon">⚠️</span></div><div class="stat-value" id="dashGap">10.4</div><div class="stat-foot">Demand minus available supply</div></div>
+  <div class="card"><div class="stat-top">Model R² <span class="stat-icon">◎</span></div><div class="stat-value" id="dashR2">0.91</div><div class="stat-foot">Illustrative demo metric, not trained result</div></div>
+ </div>
+
+ <div class="grid two">
+  <div class="card">
+   <div class="section-head" style="margin-top:0">
+    <div><h2>Water demand trend</h2><div class="small muted">Historical and illustrative forecast</div></div>
+    <span class="tag">2000–2030</span>
+   </div>
+   <canvas class="chart" id="trendChart"></canvas>
+   <div class="legend">
+    <span><i class="dot" style="background:#1677c8"></i>Historical</span>
+    <span><i class="dot" style="background:#22b8cf"></i>Forecast</span>
+   </div>
+  </div>
+  <div class="card">
+   <h2>System alerts</h2>
+   <div class="small muted">Agent monitoring summary</div>
+   <div id="dashboardAlerts"></div>
+   <div class="actions">
+    <button class="btn secondary" onclick="showPage('agents')">View agent centre</button>
+   </div>
+  </div>
+ </div>
+
+ <div class="section-head"><h2>Allocation overview</h2><span class="small muted">Illustrative allocation shares</span></div>
+ <div class="grid three">
+  <div class="card"><h3>🏠 Household</h3><div class="metric">35%</div><div class="barline"><span style="width:35%"></span></div></div>
+  <div class="card"><h3>🌾 Agriculture</h3><div class="metric">50%</div><div class="barline"><span style="width:50%"></span></div></div>
+  <div class="card"><h3>🏭 Industry</h3><div class="metric">15%</div><div class="barline"><span style="width:15%"></span></div></div>
+ </div>
+</section>
+
+<section class="page" id="forecast">
+ <div class="grid two">
+  <div class="card">
+   <h2>Generate water demand forecast</h2>
+   <p class="small muted">Enter scenario values to estimate demand using a simple linear trend demonstration.</p>
+   <div class="form-grid">
+    <div class="field"><label>Country / Region</label><input id="country" value="India"></div>
+    <div class="field"><label>Forecast year</label><input id="year" type="number" min="2025" max="2050" value="2027"></div>
+    <div class="field"><label>Population (millions)</label><input id="population" type="number" min="1" value="1420"></div>
+    <div class="field"><label>Previous consumption (BCM)</label><input id="previous" type="number" min="0" step=".1" value="115"></div>
+    <div class="field"><label>Temperature (°C)</label><input id="temperature" type="number" step=".1" value="28"></div>
+    <div class="field"><label>Rainfall impact (mm)</label><input id="rainfall" type="number" step=".1" value="800"></div>
+   </div>
+   <div class="actions">
+    <button class="btn" onclick="runForecast()">Generate forecast</button>
+    <button class="btn secondary" onclick="resetForecast()">Reset values</button>
+   </div>
+   <div class="notice">Demo note: this page uses a transparent illustrative formula. It is not a fitted Scikit-learn model. Upload the project CSV and connect a trained model for research-grade predictions.</div>
+  </div>
+
+  <div class="card">
+   <h2>Forecast result</h2>
+   <div class="small muted">Estimated total water consumption</div>
+   <div class="stat-value" id="forecastValue">128.4 BCM</div>
+   <div id="forecastStatus" class="notice">Generate a forecast to update this result.</div>
+   <div class="section-head"><h3>Input summary</h3></div>
+   <div id="inputSummary" class="small muted">Your selected scenario will appear here.</div>
+  </div>
+ </div>
+ <div class="card" style="margin-top:16px">
+  <h2>Forecast visualization</h2>
+  <canvas class="chart" id="forecastChart"></canvas>
+ </div>
+</section>
+
+<section class="page" id="model">
+ <div class="grid two">
+  <div class="card">
+   <h2>Linear Regression model workflow</h2>
+   <ol class="feature-list">
+    <li>Load the Global Water Consumption CSV using Pandas.</li>
+    <li>Clean missing values, duplicates and inconsistent records.</li>
+    <li>Encode categorical fields and select numerical features.</li>
+    <li>Split the data into 80% training and 20% testing sets.</li>
+    <li>Train Linear Regression and predict test-set demand.</li>
+    <li>Evaluate predictions using R², MAE and RMSE.</li>
+   </ol>
+   <div class="notice">The PPT describes the model plan. The metric values shown here are sample placeholders until a model is trained on the dataset.</div>
+  </div>
+
+  <div class="card">
+   <h2>Evaluation metrics</h2>
+   <div class="grid three">
+    <div><div class="small muted">R² score</div><div class="metric">0.91*</div><div class="small muted">Fit indicator</div></div>
+    <div><div class="small muted">MAE</div><div class="metric">4.2*</div><div class="small muted">BCM average error</div></div>
+    <div><div class="small muted">RMSE</div><div class="metric">5.6*</div><div class="small muted">BCM error scale</div></div>
+   </div>
+   <p class="small muted">*Illustrative values only; replace with actual test results.</p>
+  </div>
+ </div>
+
+ <div class="section-head"><h2>Model input features</h2></div>
+ <div class="card table-wrap">
+  <table>
+   <thead><tr><th>Feature</th><th>Role</th><th>Description from project</th></tr></thead>
+   <tbody>
+    <tr><td>Country</td><td>Input / encoded</td><td>Country-wise yearly record</td></tr>
+    <tr><td>Year</td><td>Input</td><td>Historical year</td></tr>
+    <tr><td>Per Capita Water Use</td><td>Input</td><td>Litres per person per day</td></tr>
+    <tr><td>Agricultural / Industrial / Household use</td><td>Input</td><td>Sector water-use percentages</td></tr>
+    <tr><td>Rainfall Impact</td><td>Input</td><td>Rainfall in millimetres</td></tr>
+    <tr><td>Groundwater Depletion Rate</td><td>Input</td><td>Depletion percentage</td></tr>
+    <tr><td>Total Water Consumption</td><td>Target</td><td>Billion cubic metres</td></tr>
+   </tbody>
+  </table>
+ </div>
+</section>
+
+<section class="page" id="agents">
+ <div class="grid two">
+  <div class="card">
+   <h2>Intelligent agent monitoring</h2>
+   <p class="small muted">The agent compares predicted demand with available supply and raises alerts using the threshold below.</p>
+   <div class="field"><label>Predicted demand (BCM)</label><input type="number" id="agentDemand" value="128.4" step=".1"></div>
+   <div class="field"><label>Available supply (BCM)</label><input type="number" id="agentSupply" value="118" step=".1"></div>
+   <div class="field"><label>Shortage alert threshold (%)</label><input type="number" id="threshold" value="5" min="0" max="100"></div>
+   <button class="btn" onclick="runAgent()">Run monitoring agent</button>
+  </div>
+  <div class="card">
+   <h2>Agent decision</h2>
+   <div id="agentDecision" class="notice">Run the monitoring agent to inspect the demand and supply gap.</div>
+   <div class="small muted">Decision logic: gap = predicted demand − available supply. If the gap exceeds the selected threshold, a shortage alert is generated.</div>
+  </div>
+ </div>
+
+ <div class="section-head"><h2>Recent monitoring log</h2></div>
+ <div class="card table-wrap">
+  <table>
+   <thead><tr><th>Time</th><th>Demand</th><th>Supply</th><th>Gap</th><th>Agent status</th></tr></thead>
+   <tbody id="agentLog">
+    <tr><td>Demo</td><td>128.4</td><td>118.0</td><td>10.4</td><td><span class="status warn">Shortage risk</span></td></tr>
+   </tbody>
+  </table>
+ </div>
+</section>
+
+<section class="page" id="allocation">
+ <div class="grid two">
+  <div class="card">
+   <h2>Water allocation optimizer</h2>
+   <p class="small muted">Enter supply and priority weights. The demonstration distributes available water proportionally across sectors.</p>
+   <div class="field"><label>Available water supply (BCM)</label><input id="allocSupply" type="number" value="118" min="0" step=".1"></div>
+   <div class="field"><label>Household priority weight</label><input id="homeWeight" type="number" value="40" min="0"></div>
+   <div class="field"><label>Agriculture priority weight</label><input id="agriWeight" type="number" value="40" min="0"></div>
+   <div class="field"><label>Industry priority weight</label><input id="industryWeight" type="number" value="20" min="0"></div>
+   <button class="btn teal" onclick="optimizeAllocation()">Optimize allocation</button>
+  </div>
+  <div class="card">
+   <h2>Recommended allocation</h2>
+   <div id="allocationResult" class="small muted">Enter weights and select Optimize allocation.</div>
+   <div class="notice success">Planning support only: final distribution should follow local regulations, essential-service needs and verified supply data.</div>
+  </div>
+ </div>
+
+ <div class="section-head"><h2>Allocation principles</h2></div>
+ <div class="grid three">
+  <div class="card"><h3>1. Essential needs</h3><p class="small muted">Prioritize residential use and public services.</p></div>
+  <div class="card"><h3>2. Demand matching</h3><p class="small muted">Compare available supply with predicted sector demand.</p></div>
+  <div class="card"><h3>3. Reduce wastage</h3><p class="small muted">Avoid unnecessary excess allocation and review usage.</p></div>
+ </div>
+</section>
+
+<section class="page" id="data">
+ <div class="grid two">
+  <div class="card">
+   <h2>Upload project dataset</h2>
+   <p class="small muted">Choose the cleaned_global_water_consumption.csv file referenced in your PPT.</p>
+   <div class="filebox">
+    <div style="font-size:28px">📄</div>
+    <b>CSV dataset upload</b>
+    <p class="small muted">Expected columns include Country, Year, sector water use, rainfall impact and Total Water Consumption.</p>
+    <input type="file" id="csvFile" accept=".csv,text/csv" onchange="loadCSV(event)">
+   </div>
+   <div id="uploadMessage" class="notice">No dataset uploaded yet. Demo data is used in the dashboard.</div>
+  </div>
+
+  <div class="card">
+   <h2>Dataset information (from PPT)</h2>
+   <div class="grid three">
+    <div><div class="metric">500</div><div class="small muted">Records</div></div>
+    <div><div class="metric">10</div><div class="small muted">Columns</div></div>
+    <div><div class="metric">20</div><div class="small muted">Countries</div></div>
+   </div>
+   <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+   <p class="small"><b>Period:</b> 2000–2024</p>
+   <p class="small"><b>Source:</b> Kaggle – Global Water Consumption Dataset (Atharva Soundankar)</p>
+   <p class="small"><b>Planned split:</b> 80% training / 20% testing</p>
+  </div>
+ </div>
+
+ <div class="section-head"><h2>CSV preview</h2><span class="small muted" id="rowCount">No file loaded</span></div>
+ <div class="card table-wrap" id="csvPreview"><div class="empty">Upload a CSV file to preview its first rows.</div></div>
+</section>
+
+<section class="page" id="about">
+ <div class="card">
+  <div class="eyebrow">Project presentation</div>
+  <h2 style="font-size:22px;margin-top:5px">Intelligent Agent-Based Water Demand Forecasting and Optimization System using Linear Regression</h2>
+  <p class="muted">CSA1713 – Artificial Intelligence</p>
+  <p><b>Presented by:</b> Priya Varshini. T, Bhuvaneswari. T, Marsha Melish, Yogasri Senthilkumar</p>
+  <p><b>Guided by:</b> Dr. Sundar Rajan S</p>
+ </div>
+
+ <div class="section-head"><h2>Project objectives</h2></div>
+ <div class="grid two">
+  <div class="card">
+   <ul class="feature-list">
+    <li>Forecast water demand at country and district level from 2025 onward.</li>
+    <li>Evaluate the model using R², MAE and RMSE.</li>
+    <li>Monitor forecasts and raise alerts for high demand and water scarcity.</li>
+    <li>Optimize allocation and present results through charts and tables.</li>
+   </ul>
+  </div>
+  <div class="card">
+   <h3>Proposed system architecture</h3>
+   <div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center">
+    <span class="tag">Kaggle CSV</span> →
+    <span class="tag">Preprocessing</span> →
+    <span class="tag">Linear Regression</span> →
+    <span class="tag">Forecast</span> →
+    <span class="tag">Agents</span> →
+    <span class="tag">Optimization</span> →
+    <span class="tag">Dashboard</span>
+   </div>
+  </div>
+ </div>
+
+ <div class="section-head"><h2>Existing system vs proposed system</h2></div>
+ <div class="card table-wrap">
+  <table>
+   <thead><tr><th>Existing system</th><th>Proposed system</th></tr></thead>
+   <tbody>
+    <tr><td>Manual calculations and rough averages</td><td>Linear Regression forecasting from historical records</td></tr>
+    <tr><td>Manual data analysis</td><td>Automated demand prediction</td></tr>
+    <tr><td>Fixed schedules or human-only decisions</td><td>Optimization-supported allocation</td></tr>
+    <tr><td>Shortages and excess allocation identified separately</td><td>Agent alerts for possible shortages and excess supply</td></tr>
+   </tbody>
+  </table>
+ </div>
+
+ <div class="section-head"><h2>SDG mapping</h2></div>
+ <div class="grid three">
+  <div class="card"><h3>SDG 6 · Clean Water</h3><p class="small muted">Forecasts demand, identifies possible shortages and supports efficient water allocation.</p></div>
+  <div class="card"><h3>SDG 11 · Sustainable Cities</h3><p class="small muted">Supports urban water planning and preparation for changing demand.</p></div>
+  <div class="card"><h3>SDG 12 · Responsible Consumption</h3><p class="small muted">Encourages responsible usage and efficient resource management.</p></div>
+ </div>
+
+ <div class="section-head"><h2>Tools and technologies</h2></div>
+ <div class="card">
+  <span class="tag">Python</span><span class="tag">Streamlit</span><span class="tag">Scikit-learn</span><span class="tag">Pandas</span><span class="tag">NumPy</span><span class="tag">Plotly</span><span class="tag">VS Code</span><span class="tag">Git</span>
+ </div>
+
+ <div class="section-head"><h2>Future work</h2></div>
+ <div class="card">
+  <ul class="feature-list">
+   <li>Integrate cloud storage for multi-location access.</li>
+   <li>Compare Linear Regression with advanced machine-learning models.</li>
+   <li>Add drought and emergency shortage planning.</li>
+   <li>Simulate different demand, supply and allocation conditions.</li>
+   <li>Provide automated notifications during critical shortages.</li>
+   <li>Develop adaptive agents that update decisions as conditions change.</li>
+  </ul>
+ </div>
+
+ <div class="section-head"><h2>Project timeline</h2></div>
+ <div class="card table-wrap">
+  <table>
+   <thead><tr><th>Timeline</th><th>Remaining tasks</th><th>Milestone</th></tr></thead>
+   <tbody>
+    <tr><td>Weeks 1–2</td><td>Finalize dataset and inputs</td><td>Dataset finalized</td></tr>
+    <tr><td>Weeks 3–4</td><td>Develop and evaluate model</td><td>Forecast model completed</td></tr>
+    <tr><td>Weeks 5–6</td><td>Agent decision-making</td><td>Agent completed</td></tr>
+    <tr><td>Weeks 7–8</td><td>Allocation optimization</td><td>Optimization completed</td></tr>
+    <tr><td>Weeks 9–10</td><td>Dashboard integration</td><td>Application ready</td></tr>
+    <tr><td>Week 11</td><td>Testing and validation</td><td>Testing completed</td></tr>
+    <tr><td>Week 12</td><td>Documentation and demo</td><td>Final submission</td></tr>
+   </tbody>
+  </table>
+ </div>
+
+ <div class="section-head"><h2>Conclusion</h2></div>
+ <div class="card">
+  <p class="muted">The proposed application combines Linear Regression forecasting, intelligent agent monitoring and water allocation optimization. Forecast charts and alerts can help planners understand future demand, identify potential shortages and make more informed decisions to reduce wastage and support sustainable water use.</p>
+ </div>
+</section>
+
+<div class="footer">WaterWise · Academic project demonstration · Values shown without a trained model are illustrative only.</div>
+</main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
